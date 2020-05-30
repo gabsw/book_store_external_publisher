@@ -7,7 +7,8 @@ from flask import Flask, jsonify
 publisher_name = 'External Publisher'
 username = 'external_publisher'
 password = 'pw'
-url = os.getenv('BOOKSTORE_URL', 'localhost:8080')
+url = os.getenv('BOOKSTORE_URL', 'http://localhost:8080')
+port = os.getenv('PORT', 5000)
 
 session = requests.Session()
 
@@ -16,7 +17,7 @@ auth_token = None
 app = Flask(__name__)
 
 
-@app.route('/api/external-publisher/stock/automatic-renewal', methods=['GET'])
+@app.route('/api/external-publisher/stock/renew', methods=['GET'])
 def stock_renewal():
     headers = login()
     stock = renew_stock(headers)
@@ -41,28 +42,6 @@ def fetch_sold_out_books(headers):
     current_page = 0
     sold_out_books = []
 
-    while True:
-        response = session.get(f"{url}/api/publisher/{publisher_name}/stock?page={current_page}",
-                               headers=headers)
-        book_page = response.json()
-        is_last_page = book_page['last']
-
-        books = book_page['content']
-        for book in books:
-            if book['quantity'] == 0:
-                sold_out_books.append(book)
-
-        if is_last_page:
-            break
-        current_page += 1
-
-    return sold_out_books
-
-
-def renew_stock(headers):
-    current_page = 0
-    renewed_stock = []
-
     print('Retrieving stock from book store...')
 
     while True:
@@ -76,17 +55,26 @@ def renew_stock(headers):
             print('Checking book for stock: ', book)
             if book['quantity'] == 0:
                 print(book['title'], ' has 0 copies in stock.')
-                renewed_stock = update_book(book['isbn'], headers)
+                sold_out_books.append(book)
 
         if is_last_page:
             break
         current_page += 1
 
+    return sold_out_books
+
+
+def renew_stock(headers):
+    sold_out_books = fetch_sold_out_books(headers)
+    renewed_stock = [update_book(book['isbn'], headers) for book in sold_out_books]
     return renewed_stock
 
 
 def update_book(isbn, headers):
     new_stock = {'isbn': isbn, 'quantity': compute_quantity(headers)}
+    if new_stock['quantity'] is None:
+        return {'isbn': isbn, 'error': 'Revenue check has failed.'}
+
     print('Updating book with isbn ', isbn, '.')
     print('Sending 10 new copies to marketplace...')
     response = session.put(f"{url}/api/publisher/{publisher_name}/stock", json=new_stock,
@@ -94,7 +82,7 @@ def update_book(isbn, headers):
 
     if response.status_code != 200:
         print("Stock update has failed.")
-        return {'isbn': isbn, 'quantity': 0}
+        return {'isbn': isbn, 'error': 'Stock update has failed.'}
     else:
         return new_stock
 
@@ -105,7 +93,7 @@ def compute_quantity(headers):
 
     if response.status_code != 200:
         print("Revenue check has failed.")
-        return 0
+        return None
 
     amount = response.json()
 
@@ -120,4 +108,4 @@ def compute_quantity(headers):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=port)

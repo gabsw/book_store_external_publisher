@@ -1,1 +1,1 @@
-worker: python publisher.py
+web: python publisher.py
