@@ -17,14 +17,14 @@ auth_token = None
 app = Flask(__name__)
 
 
-@app.route('/api/external-publisher/stock/renew', methods=['GET'])
+@app.route('/api/stock/renew', methods=['GET'])
 def stock_renewal():
     headers = login()
     stock = renew_stock(headers)
     return jsonify(stock)
 
 
-@app.route('/api/external-publisher/stock/sold-out', methods=['GET'])
+@app.route('/api/stock/sold-out', methods=['GET'])
 def get_sold_out_books():
     headers = login()
     books = fetch_sold_out_books(headers)
