@@ -8,7 +8,7 @@ publisher_name = 'External Publisher'
 username = 'external_publisher'
 password = 'pw'
 url = os.getenv('BOOKSTORE_URL', 'http://localhost:8080')
-port = os.getenv('PORT', 5000)
+port = int(os.getenv('PORT', 5000))
 
 session = requests.Session()
 
