@@ -24,6 +24,8 @@ def login():
 def get_stock(headers):
     current_page = 0
 
+    print('Retrieving stock from book store...')
+
     while True:
         response = session.get(f"{url}/api/publisher/{publisher_name}/stock?page={current_page}",
                                headers=headers)
@@ -32,6 +34,7 @@ def get_stock(headers):
 
         books = book_page['content']
         for book in books:
+            print('Checking book for stock: ', book)
             if book['quantity'] == 0:
                 print(book['title'], ' has 0 copies in stock.')
                 update_stock(book['isbn'], headers)
@@ -56,4 +59,4 @@ if __name__ == '__main__':
     while True:
         headers = login()
         get_stock(headers)
-        time.sleep(60 * 60)
+        time.sleep(60)
