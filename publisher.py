@@ -2,7 +2,7 @@ import os
 
 import requests
 from requests.auth import HTTPBasicAuth
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 publisher_name = 'External Publisher'
 username = 'external_publisher'
@@ -29,6 +29,11 @@ def get_sold_out_books():
     headers = login()
     books = fetch_sold_out_books(headers)
     return jsonify(books)
+
+
+@app.route('/api', methods=['GET'])
+def get_api_doc():
+    return render_template('api-doc.html', title='External Publisher API')
 
 
 def login():
