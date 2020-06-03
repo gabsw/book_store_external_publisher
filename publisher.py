@@ -31,7 +31,7 @@ def get_sold_out_books():
     return jsonify(books)
 
 
-@app.route('/api', methods=['GET'])
+@app.route('/', methods=['GET'])
 def get_api_doc():
     return render_template('api-doc.html', title='External Publisher API')
 
