@@ -14,6 +14,7 @@ Gabriela Santos
 
 ## Resources
 * [External Publisher deployed on Heroku](https://external-publisher.herokuapp.com/)
+* [Marketplace deployed on Heroku](https://bookstore-tqs.herokuapp.com/)
 * [Pivotal Tracker](https://www.pivotaltracker.com/n/projects/2447537)
 * [BookStore Main Repository](https://https://github.com/gabsw/BookStore)
 
