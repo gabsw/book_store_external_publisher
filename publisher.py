@@ -102,7 +102,7 @@ def compute_quantity(headers):
 
     amount = response.json()
 
-    if amount < 100:
+    if amount < 150:
         return 5
     elif amount < 500:
         return 10
